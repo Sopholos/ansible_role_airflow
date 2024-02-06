@@ -76,6 +76,7 @@ airflow_log_format: "[%%(asctime)s] {{ '{' }}%%(filename)s:%%(lineno)d{{ '}' }} 
 airflow_simple_log_format: >
   %%(asctime)s %%(levelname)s - %%(message)s
 airflow_task_log_prefix_template:
+#airflow_log_filename_template: "{{ '{{' }} ti.dag_id {{ '}}' }}/run_id={{ '{{' }} ti.run_id {{ '}}' }}/task_id={{ '{{' }} ti.task_id {{ '}}' }}/{%% if ti.map_index >= 0 %%}map_index={{ '{{' }} ti.map_index {{ '}}' }}/{%% endif %%}attempt={{ '{{' }} try_number {{ '}}' }}.log"
 airflow_log_filename_template: "{{ '{{' }} ti.dag_id {{ '}}' }}/{{ '{{' }} ti.task_id {{ '}}' }}/{{ '{{' }} ts {{ '}}' }}/{{ '{{' }} try_number {{ '}}' }}.log"
 airflow_log_processor_filename_template: "{{ '{{' }} filename {{ '}}' }}.log"
 airflow_dag_processor_manager_log_location: "{{ airflow_logs_folder }}/dag_processor_manager/dag_processor_manager.log"
@@ -107,7 +108,7 @@ airflow_fail_fast: False
 
 # [api]
 airflow_enable_experimental_api: False
-airflow_auth_backend: airflow.api.auth.backend.default
+airflow_auth_backend: airflow.api.auth.backend.session
 airflow_maximum_page_limit: 100
 airflow_fallback_page_limit: 100
 airflow_google_oauth2_audience:
@@ -156,7 +157,7 @@ airflow_webserver_access_logformat:
 airflow_webserver_expose_config: False
 airflow_webserver_expose_hostname: True
 airflow_webserver_expose_stacktrace: True
-airflow_webserver_dag_default_view: tree  # Valid values are: tree, graph, duration, gantt, landing_times
+airflow_webserver_dag_default_view: grid  # Valid values are: tree, graph, duration, gantt, landing_times, grid
 airflow_webserver_dag_orientation: LR
 airflow_webserver_log_fetch_timeout_sec: 5
 airflow_webserver_log_fetch_delay_sec: 2

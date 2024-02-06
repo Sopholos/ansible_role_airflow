@@ -42,10 +42,16 @@
     version: "{{ airflow_pip_version }}"
   when: airflow_pip_version is defined
 
-- name: Airflow | Install virtualenv
+- name: Airflow | Check if system virtualenv is already available
+  stat:
+    path: "/usr/bin/virtualenv"
+  register: sysvirtualenv_check
+
+- name: Airflow | Install virtualenv with pip
   pip:
     executable: "{{ airflow_pip_executable }}"
     name: virtualenv
+  when: not sysvirtualenv_check.stat.exists
 
 - name: Airflow | Check if exists virtualenv
   stat:
@@ -103,7 +109,7 @@
     state: present
     virtualenv: "{{ airflow_app_home }}"
     virtualenv_python: "python{{ airflow_python_version | default(omit) }}"
-    extra_args: --no-cache-dir
+    extra_args: --no-cache-dir --constraint "https://raw.githubusercontent.com/apache/airflow/constraints-{{ airflow_version }}/constraints-{{ airflow_python_version }}.txt"
   register: airflow_install
   environment:
     SLUGIFY_USES_TEXT_UNIDECODE: "yes"
