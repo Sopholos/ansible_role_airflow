@@ -8,4 +8,5 @@ galaxy_info:
   platforms:
     - name: Debian
       versions:
-        - stretch
+        - bookworm
+  role_name: idealista.ansible_role
