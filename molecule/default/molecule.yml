@@ -3,7 +3,7 @@ dependency:
   name: galaxy
 
 driver:
-  name: docker
+  name: podman
 
 lint: |
   yamllint .
@@ -13,7 +13,8 @@ platforms:
   - name: airflow
     groups:
       - airflow_group
-    image: ${MOLECULE_DISTRO:-debian:buster-slim}
+    image: ${MOLECULE_DISTRO:-debian:bookworm-slim}
+    dockerfile: Dockerfile-bookworm.j2
     privileged: false
     capabilities:
       - SYS_ADMIN
