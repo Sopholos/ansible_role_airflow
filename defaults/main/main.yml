@@ -129,9 +129,30 @@ airflow_default_required_libs:
   - sqlite3
   - unixodbc
 
+# Airflow 2.0 system level requirements https://airflow.apache.org/docs/apache-airflow/stable/installation.html#system-dependencies
+airflow_default_required_rpms:
+  - python3.11
+  - python3.11-devel
+  - python3.11-pip
+  - python3.11-setuptools
+#  - python3.11-virtualenv
+#  - krb5-user
+#  - ldap-utils
+  - libffi
+#  - libsasl2-2
+#  - libsasl2-modules
+  - openssl-libs
+#  - locales
+#  - lsb-release
+#  - sasl2-bin
+  - sqlite
+  - unixODBC
+
 airflow_additional_required_libs: []
+airflow_additional_required_rpms: []
 
 airflow_required_libs: "{{ airflow_default_required_libs + airflow_additional_required_libs }}"
+airflow_required_rpms: "{{ airflow_default_required_rpms + airflow_additional_required_rpms }}"
 
 # These can be taken from the constraints file described in the install doc in
 # case of installation issues.
