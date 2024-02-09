@@ -29,11 +29,19 @@
     dest: "/etc/profile.d/airflow.sh"
     mode: 0644
 
-- name: Airflow | Installing dependencies
+- name: Airflow | Installing dependencies (apt)
   apt:
     pkg: "{{ airflow_required_libs }}"
     state: present
     update_cache: true
+  when: ansible_os_family == 'Debian'
+
+- name: Airflow | Installing dependencies (dnf)
+  dnf:
+    pkg: "{{ airflow_required_rpms }}"
+    state: present
+    update_cache: true
+  when: ansible_os_family == 'RedHat'
 
 # See https://airflow.apache.org/docs/apache-airflow/stable/installation.html#installation-tools
 - name: Airflow | Install pip "{{ airflow_pip_version }}" version
@@ -47,9 +55,10 @@
     path: "/usr/bin/virtualenv"
   register: sysvirtualenv_check
 
-- name: Airflow | Install virtualenv with pip
+- name: Airflow | Install virtualenv with pip into /usr
   pip:
     executable: "{{ airflow_pip_executable }}"
+    extra_args: "--prefix=/usr"
     name: virtualenv
   when: not sysvirtualenv_check.stat.exists
 
@@ -62,7 +71,8 @@
   become: true
   become_user: "{{ airflow_user }}"
   command: "virtualenv -p python{{ airflow_python_version | default(omit) }} {{ airflow_app_home }}"
-  when: not virtualenv_check.stat.exists
+#  when: not virtualenv_check.stat.exists
+  when: false
 
 - name: Airflow | Installing Python pip dependencies
   become: true
