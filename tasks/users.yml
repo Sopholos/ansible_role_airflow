@@ -1,5 +1,9 @@
 ---
 
+- name: Pause for 30 seconds to allow roles database to be built
+  ansible.builtin.pause:
+    seconds: 30
+
 - name: Airflow | Check users (> 2.0)
   become: true
   become_user: "{{ airflow_user }}"
