@@ -1,32 +1,32 @@
 ---
 # handlers file for airflow-role
 
-- name: restart airflow-webserver
-  systemd:
+- name: Restart airflow-webserver
+  ansible.builtin.systemd:
     name: airflow-webserver
     state: restarted
   when: >-
    airflow_services['airflow_webserver']
    and airflow_services['airflow_webserver']['enabled']
 
-- name: restart airflow-scheduler
-  systemd:
+- name: Restart airflow-scheduler
+  ansible.builtin.systemd:
     name: airflow-scheduler
     state: restarted
   when: >-
    airflow_services['airflow_scheduler']
    and airflow_services['airflow_scheduler']['enabled']
 
-- name: restart airflow-worker
-  systemd:
+- name: Restart airflow-worker
+  ansible.builtin.systemd:
     name: airflow-worker
     state: restarted
   when: >-
    airflow_services['airflow_worker']
    and airflow_services['airflow_worker']['enabled']
 
-- name: restart airflow-flower
-  systemd:
+- name: Restart airflow-flower
+  ansible.builtin.systemd:
     name: airflow-flower
     state: restarted
   when: >-

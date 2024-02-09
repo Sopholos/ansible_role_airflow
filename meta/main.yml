@@ -9,4 +9,11 @@ galaxy_info:
     - name: Debian
       versions:
         - bookworm
-  role_name: idealista.ansible_role
+    - name: Ubuntu
+      versions:
+        - jammy
+    - name: EL
+      versions:
+        - '8'
+  namespace: idealista
+  role_name: ansible_role

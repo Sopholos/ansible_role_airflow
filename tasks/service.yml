@@ -1,7 +1,7 @@
 ---
 
 - name: Airflow | Copy Environment File
-  template:
+  ansible.builtin.template:
     src: airflow-environment-file.j2
     dest: "{{ airflow_environment_file_folder }}/airflow"
     mode: 0644
@@ -9,16 +9,16 @@
     group: "{{ airflow_group }}"
 
 - name: Airflow | Copy Daemon scripts
-  template:
+  ansible.builtin.template:
     src: "{{ item.value.path }}"
     dest: "/lib/systemd/system/{{ item.value.service_name }}.service"
     mode: 0644
-  notify: restart {{ item.value.service_name }}
+  notify: Restart {{ item.value.service_name }}
   with_dict: "{{ airflow_services }}"
   when: airflow_services is defined
 
 - name: Airflow | Configuring service
-  systemd:
+  ansible.builtin.systemd:
     name: "{{ item.value.service_name }}"
     state: "{{ item.value.state }}"
     enabled: "{{ item.value.enabled }}"
