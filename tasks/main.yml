@@ -18,6 +18,10 @@
     - service
     - airflow_service
 
+- name: Pause for 30 seconds to allow roles database to be built
+  ansible.builtin.pause:
+    seconds: 30
+
 - name: Airflow | Users
   ansible.builtin.import_tasks: users.yml
   tags:
