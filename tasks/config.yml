@@ -75,14 +75,46 @@
 
 - name: Airflow | Initializing DB > 2.0
   ansible.builtin.command: "{{ airflow_executable }} db init"
+  environment:
+    AIRFLOW_HOME: "{{ airflow_app_home }}"
   become: true
   become_user: "{{ airflow_user }}"
   when:
     - airflow_version is version( '2.0.0', '>=')
-    - airflow_install.changed or airflow_config.changed
+    - airflow_force_init
+      or (airflow_install is defined and airflow_install.changed)
+      or (airflow_config is defined and airflow_config.changed)
+  register: airflow_init
   changed_when: true
   notify:
     "{{ ['Restart'] | product(airflow_services.values() | map(attribute='service_name')) | map('join', ' ') | list }}"
+  tags: airflow-db-init
+
+- name: Airflow | Initializing DB stdout
+  debug: msg="{{ airflow_init.stdout }}"
+  when: airflow_init is defined and airflow_init.stdout is defined 
+  tags: airflow-db-init
+
+- name: Airflow | Migrating DB > 2.0
+  ansible.builtin.command: "{{ airflow_executable }} db migrate"
+  environment:
+    AIRFLOW_HOME: "{{ airflow_app_home }}"
+  become: true
+  become_user: "{{ airflow_user }}"
+  when:
+    - airflow_version is version( '2.0.0', '>=')
+    - airflow_force_init
+      or (airflow_install is defined and airflow_install.changed)
+      or (airflow_config is defined and airflow_config.changed)
+  register: airflow_migrate
+  changed_when: true
+  notify:
+    "{{ ['Restart'] | product(airflow_services.values() | map(attribute='service_name')) | map('join', ' ') | list }}"
+  tags: airflow-db-init
+
+- name: Airflow | Migrating DB stdout
+  debug: msg="{{ airflow_migrate.stdout }}"
+  when: airflow_migrate is defined and airflow_migrate.stdout is defined 
   tags: airflow-db-init
 
 - name: Airflow | Copy extra airflow config files (provided by playbooks)
@@ -114,6 +146,8 @@
 
 - name: Airflow | Add variables from configuration file
   ansible.builtin.command: "{{ airflow_executable }} variables -s {{ item.key }} {{ item.value }}"
+  environment:
+    AIRFLOW_HOME: "{{ airflow_app_home }}"
   become: true
   become_user: "{{ airflow_user }}"
   with_items: "{{ airflow_admin_variables }}"
@@ -125,6 +159,8 @@
   ansible.builtin.command: "{{ airflow_executable }} connections -a \
   {% for key, value in item.iteritems() %}--{{ key }} '{{ value }}' \
   {% endfor %}"
+  environment:
+    AIRFLOW_HOME: "{{ airflow_app_home }}"
   become: true
   become_user: "{{ airflow_user }}"
   with_items: "{{ airflow_admin_connections }}"

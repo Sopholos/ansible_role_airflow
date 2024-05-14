@@ -253,3 +253,6 @@ celery_version: 5.3.6
 # list of items following the structure provided in the example comment
 # dags_dependencies:
 #   - {name: pip_package, version: version_needed}
+
+# force init db
+airflow_force_init: false
