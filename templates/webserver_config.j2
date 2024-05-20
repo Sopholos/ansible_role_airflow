@@ -66,6 +66,9 @@ AUTH_LDAP_BIND_PASSWORD = '{{ airflow_AUTH_LDAP_BIND_PASSWORD }}'  # the special
 # only allow users with memberOf="cn=myTeam,ou=teams,dc=example,dc=com"
 # AUTH_LDAP_SEARCH_FILTER = "(memberOf=cn=myTeam,ou=teams,dc=example,dc=com)"
 AUTH_LDAP_SEARCH_FILTER = '{{ airflow_AUTH_LDAP_SEARCH_FILTER }}'
+
+AUTH_ROLES_MAPPING = {{ airflow_AUTH_ROLES_MAPPING }}
+AUTH_LDAP_GROUP_FIELD = '{{ airflow_AUTH_LDAP_GROUP_FIELD }}'
 {% endif %}
 
 # Setup Full admin role name
