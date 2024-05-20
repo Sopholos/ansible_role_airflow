@@ -28,7 +28,7 @@
     owner: "{{ airflow_user }}"
     group: "{{ airflow_group }}"
     mode: 0644
-  register: airflow_config
+  register: airflow_webconfig
   when: airflow_version is version( '2.0.0', '>=')
   notify:
     "{{ ['Restart'] | product(airflow_services.values() | map(attribute='service_name')) | map('join', ' ') | list }}"
@@ -84,6 +84,7 @@
     - airflow_force_init
       or (airflow_install is defined and airflow_install.changed)
       or (airflow_config is defined and airflow_config.changed)
+      or (airflow_webconfig is defined and airflow_webconfig.changed)
   register: airflow_init
   changed_when: true
   notify:
@@ -106,6 +107,7 @@
     - airflow_force_init
       or (airflow_install is defined and airflow_install.changed)
       or (airflow_config is defined and airflow_config.changed)
+      or (airflow_webconfig is defined and airflow_webconfig.changed)
   register: airflow_migrate
   changed_when: true
   notify:
