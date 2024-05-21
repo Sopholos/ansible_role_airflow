@@ -20,7 +20,7 @@
     path: "{{ item }}"
     owner: "{{ airflow_user }}"
     group: "{{ airflow_group }}"
-    mode: "0750"
+    mode: "0770"
     state: directory
   with_items: "{{ airflow_skeleton_paths }}"
 

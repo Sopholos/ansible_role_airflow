@@ -5,7 +5,7 @@
     state: directory
     owner: "{{ airflow_user }}"
     group: "{{ airflow_group }}"
-    mode: "0750"
+    mode: "0770"
   with_items:
     - "{{ airflow_logs_folder }}"
     - "{{ airflow_child_process_log_folder }}"
