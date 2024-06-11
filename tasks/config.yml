@@ -157,15 +157,31 @@
     - skip_ansible_lint
     - airflow-extra-vars-file
 
+- name: Airflow | Check connections
+  become: true
+  become_user: "{{ airflow_user }}"
+  ansible.builtin.command: "{{ airflow_executable }} connections list"
+  environment:
+    AIRFLOW_HOME: "{{ airflow_app_home }}"
+  register: airflow_check_connections
+  changed_when: false
+  no_log: true
+  tags:
+    - airflow-extra-conn-file
+
 - name: Airflow | Add connections from configuration file
-  ansible.builtin.command: "{{ airflow_executable }} connections -a \
-  {% for key, value in item.iteritems() %}--{{ key }} '{{ value }}' \
-  {% endfor %}"
+  ansible.builtin.command: |-
+    {{ airflow_executable }} connections add \
+    --conn-uri '{{ item.conn_uri }}' \
+    '{{ item.conn_id }}'
   environment:
     AIRFLOW_HOME: "{{ airflow_app_home }}"
   become: true
   become_user: "{{ airflow_user }}"
   with_items: "{{ airflow_admin_connections }}"
+  when: 
+    - "item.conn_id not in airflow_check_connections.stdout"
   tags:
     - skip_ansible_lint
     - airflow-extra-conn-file
+  no_log: true
