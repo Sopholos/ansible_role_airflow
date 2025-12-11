@@ -160,7 +160,7 @@
 - name: Airflow | Check connections
   become: true
   become_user: "{{ airflow_user }}"
-  ansible.builtin.command: "{{ airflow_executable }} connections list"
+  ansible.builtin.command: "{{ airflow_executable }} connections list --output yaml"
   environment:
     AIRFLOW_HOME: "{{ airflow_app_home }}"
   register: airflow_check_connections
