@@ -179,8 +179,8 @@
   become: true
   become_user: "{{ airflow_user }}"
   with_items: "{{ airflow_admin_connections }}"
-  when: 
-    - "item.conn_id not in airflow_check_connections.stdout"
+  when:
+    - "item.conn_id not in (airflow_check_connections.stdout | from_yaml | default([], true) | map(attribute='conn_id') | list)"
   tags:
     - skip_ansible_lint
     - airflow-extra-conn-file
