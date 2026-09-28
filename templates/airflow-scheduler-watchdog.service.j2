@@ -1,0 +1,8 @@
+# {{ ansible_managed }}
+[Unit]
+Description=Airflow scheduler watchdog (INFRA-1780)
+After={{ airflow_services['airflow_scheduler']['service_name'] }}.service
+
+[Service]
+Type=oneshot
+ExecStart={{ airflow_scheduler_watchdog_script }}
