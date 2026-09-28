@@ -1,0 +1,47 @@
+#!/bin/bash
+# {{ ansible_managed }}
+#
+# Рестартует airflow-scheduler, если его heartbeat не проходит `airflow jobs check`
+# дольше {{ airflow_scheduler_watchdog_grace_seconds }} с подряд (INFRA-1780).
+# Grace нужен, чтобы не дёргать scheduler на старте и при коротком обрыве БД:
+# рестартуем только если он сам не восстановился.
+set -uo pipefail
+
+service="{{ airflow_services['airflow_scheduler']['service_name'] }}"
+state="{{ airflow_scheduler_watchdog_state }}"
+grace="{{ airflow_scheduler_watchdog_grace_seconds }}"
+
+# Сервис остановлен руками — не вмешиваемся
+if ! systemctl is-active --quiet "$service"; then
+  rm -f "$state"
+  exit 0
+fi
+
+check_cmd='set -a; . {{ airflow_environment_file_folder }}/airflow; set +a
+exec timeout 120 {{ airflow_executable }} jobs check --job-type SchedulerJob --hostname "$(hostname -f)" --limit 1'
+
+if runuser -u {{ airflow_user }} -- bash -c "$check_cmd" >/dev/null 2>&1; then
+  if [ -f "$state" ]; then
+    echo "scheduler heartbeat восстановился сам"
+    rm -f "$state"
+  fi
+  exit 0
+fi
+
+now="$(date +%s)"
+if [ ! -f "$state" ]; then
+  mkdir -p "$(dirname "$state")"
+  echo "$now" >"$state"
+  echo "scheduler heartbeat не проходит проверку, ждём ${grace}s до рестарта"
+  exit 0
+fi
+
+first_fail="$(cat "$state" 2>/dev/null || echo "$now")"
+if [ $((now - first_fail)) -lt "$grace" ]; then
+  echo "scheduler heartbeat не проходит проверку $((now - first_fail))s"
+  exit 0
+fi
+
+echo "scheduler heartbeat не проходит проверку $((now - first_fail))s — рестарт ${service}"
+rm -f "$state"
+systemctl restart "$service"

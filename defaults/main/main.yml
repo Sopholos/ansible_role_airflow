@@ -256,3 +256,13 @@ celery_version: 5.3.6
 
 # force init db
 airflow_force_init: false
+# Scheduler watchdog (INFRA-1780): после обрыва метабазы scheduler может остаться
+# "живым, но мёртвым" (висит в "Shutting down LocalExecutor; waiting for running tasks"),
+# процесс не умирает и Restart=always не срабатывает. Таймер раз в interval
+# проверяет heartbeat (airflow jobs check) и рестартует scheduler, если тот
+# не отвечает дольше grace.
+airflow_scheduler_watchdog_enabled: true
+airflow_scheduler_watchdog_interval: 2min
+airflow_scheduler_watchdog_grace_seconds: 600
+airflow_scheduler_watchdog_script: /usr/local/sbin/airflow-scheduler-watchdog.sh
+airflow_scheduler_watchdog_state: /var/lib/airflow-scheduler-watchdog/first_fail

@@ -18,6 +18,13 @@
     - service
     - airflow_service
 
+- name: Airflow | Scheduler watchdog
+  ansible.builtin.import_tasks: watchdog.yml
+  when: airflow_scheduler_watchdog_enabled | bool
+  tags:
+    - service
+    - airflow_watchdog
+
 - name: Pause for 30 seconds to allow roles database to be built
   ansible.builtin.pause:
     seconds: 30

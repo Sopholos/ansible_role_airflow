@@ -1,0 +1,11 @@
+# {{ ansible_managed }}
+[Unit]
+Description=Airflow scheduler watchdog timer (INFRA-1780)
+
+[Timer]
+OnBootSec=5min
+OnUnitActiveSec={{ airflow_scheduler_watchdog_interval }}
+AccuracySec=10s
+
+[Install]
+WantedBy=timers.target
